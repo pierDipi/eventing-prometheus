@@ -15,15 +15,18 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: prometheus-source-webhook
+  name: knative-eventing-prometheus-webhook
   labels:
-    contrib.eventing.knative.dev/release: devel
+    app.kubernetes.io/component: prometheus-controller
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
 rules:
   # Sources admin
   - apiGroups:
       - sources.knative.dev
     resources:
       - prometheussources
+      - prometheusrulesources
     verbs: &everything
       - get
       - list
@@ -38,6 +41,7 @@ rules:
       - sources.knative.dev
     resources:
       - prometheussources/finalizers
+      - prometheusrulesources/finalizers
     verbs: *everything
 
   # Source statuses update
@@ -45,6 +49,7 @@ rules:
       - sources.knative.dev
     resources:
       - prometheussources/status
+      - prometheusrulesources/status
     verbs:
       - get
       - update

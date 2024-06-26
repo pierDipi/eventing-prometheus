@@ -15,7 +15,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: prometheus-controller
+  name: knative-eventing-prometheus-controller
 rules:
 - apiGroups:
   - apps
@@ -90,7 +90,7 @@ rules:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: eventing-contrib-prometheus-source-observer
+  name: knative-eventing-prometheus-source-observer
   labels:
     eventing.knative.dev/release: devel
     duck.knative.dev/source: "true"
@@ -99,6 +99,7 @@ rules:
       - "sources.knative.dev"
     resources:
       - "prometheussources"
+      - "prometheusrulesources"
     verbs:
       - get
       - list

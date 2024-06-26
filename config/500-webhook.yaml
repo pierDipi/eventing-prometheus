@@ -16,9 +16,12 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: prometheus-source-webhook-certs
-  namespace: knative-sources
+  namespace: knative-eventing
   labels:
-    contrib.eventing.knative.dev/release: devel
+    app: prometheus-webhook
+    app.kubernetes.io/component: prometheus-webhook
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
 # The data is populated at install time.
 
 ---
@@ -26,55 +29,116 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prometheus-source-webhook
-  namespace: knative-sources
+  name: prometheus-webhook
+  namespace: knative-eventing
   labels:
-    contrib.eventing.knative.dev/release: devel
+    app: prometheus-webhook
+    knative.dev/high-availability: "true"
+    app.kubernetes.io/component: prometheus-webhook
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
+    bindings.knative.dev/exclude: "true"
 spec:
   replicas: 1
   selector:
     matchLabels: &labels
-      app: prometheus-source-webhook
-      role: prometheus-source-webhook
+      app: prometheus-webhook
   template:
     metadata:
       annotations:
         sidecar.istio.io/inject: "false"
       labels: *labels
     spec:
-      serviceAccountName: prometheus-source-webhook
+      serviceAccountName: prometheus-webhook
       containers:
-        - name: prometheus-source-webhook
+        - name: prometheus-webhook
           terminationMessagePolicy: FallbackToLogsOnError
           image: ko://knative.dev/eventing-prometheus/cmd/webhook
           env:
-            - name: SYSTEM_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: CONFIG_LOGGING_NAME
-              value: config-logging
-            - name: METRICS_DOMAIN
-              value: knative.dev/eventing
-            - name: WEBHOOK_NAME
-              value: prometheus-source-webhook
+          - name: SYSTEM_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: CONFIG_LOGGING_NAME
+            value: config-logging
+          - name: METRICS_DOMAIN
+            value: knative.dev/eventing
+          - name: WEBHOOK_PORT
+            value: "8443"
+          - name: WEBHOOK_NAME
+            value: prometheus-webhook
+            # SINK_BINDING_SELECTION_MODE specifies the NamespaceSelector and ObjectSelector
+            # for the sinkbinding webhook.
+            # If `inclusion` is selected, namespaces/objects labelled as `bindings.knative.dev/include:true`
+            # will be considered by the sinkbinding webhook;
+            # If `exclusion` is selected, namespaces/objects labelled as `bindings.knative.dev/exclude:true`
+            # will NOT be considered by the sinkbinding webhook.
+            # The default is `exclusion`.
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+
+          resources:
+            requests:
+              # taken from serving.
+              cpu: 100m
+              memory: 50Mi
+            limits:
+              # taken from serving.
+              cpu: 200m
+              memory: 200Mi
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+
           ports:
-            - containerPort: 9090
-              name: metrics
-          # TODO set proper resource limits.
+            - name: https-webhook
+              containerPort: 8443
+            - name: metrics
+              containerPort: 9090
+            - name: profiling
+              containerPort: 8008
+
+          readinessProbe:
+            periodSeconds: 1
+            httpGet:
+              scheme: HTTPS
+              port: 8443
+              httpHeaders:
+                - name: k-kubelet-probe
+                  value: "webhook"
+          livenessProbe:
+            periodSeconds: 1
+            httpGet:
+              scheme: HTTPS
+              port: 8443
+              httpHeaders:
+                - name: k-kubelet-probe
+                  value: "webhook"
+            initialDelaySeconds: 120
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    eventing.knative.dev/release: devel
-    role: prometheus-source-webhook
-  name: prometheus-source-webhook
-  namespace: knative-sources
+    app: prometheus-webhook
+    app.kubernetes.io/component: prometheus-webhook
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
+  name: prometheus-webhook
+  namespace: knative-eventing
 spec:
   ports:
     - name: https-webhook
       port: 443
       targetPort: 8443
   selector:
-    role: prometheus-source-webhook
+    app: prometheus-webhook

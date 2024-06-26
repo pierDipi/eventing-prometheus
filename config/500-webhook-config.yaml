@@ -22,8 +22,8 @@ webhooks:
   - admissionReviewVersions: ["v1", "v1beta1"]
     clientConfig:
       service:
-        name: prometheus-source-webhook
-        namespace: knative-sources
+        name: prometheus-webhook
+        namespace: knative-eventing
     sideEffects: None
     failurePolicy: Fail
     name: defaulting.webhook.prometheus.sources.knative.dev
@@ -38,8 +38,8 @@ webhooks:
   - admissionReviewVersions: ["v1", "v1beta1"]
     clientConfig:
       service:
-        name: prometheus-source-webhook
-        namespace: knative-sources
+        name: prometheus-webhook
+        namespace: knative-eventing
     sideEffects: None
     failurePolicy: Fail
     name: validation.webhook.prometheus.sources.knative.dev

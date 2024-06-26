@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	sourcev1alpha1 "knative.dev/eventing-prometheus/pkg/apis/sources/v1alpha1"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/injection/sharedmain"
@@ -30,6 +29,8 @@ import (
 	"knative.dev/pkg/webhook/resourcesemantics"
 	"knative.dev/pkg/webhook/resourcesemantics/defaulting"
 	"knative.dev/pkg/webhook/resourcesemantics/validation"
+
+	sourcev1alpha1 "knative.dev/eventing-prometheus/pkg/apis/sources/v1alpha1"
 )
 
 var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
@@ -93,7 +94,7 @@ func main() {
 	ctx := webhook.WithOptions(signals.NewContext(), webhook.Options{
 		ServiceName: webhook.NameFromEnv(),
 		Port:        8443,
-		SecretName:  "prometheus-source-webhook-certs",
+		SecretName:  "prometheus-webhook-certs",
 	})
 
 	sharedmain.WebhookMainWithContext(ctx, webhook.NameFromEnv(),

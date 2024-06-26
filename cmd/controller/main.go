@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	"knative.dev/eventing-prometheus/pkg/reconciler"
+	"knative.dev/eventing-prometheus/pkg/reconciler/prometheussource"
+
 	"knative.dev/pkg/injection/sharedmain"
 )
 
 func main() {
-	sharedmain.Main("prometheussource-controller", reconciler.NewController)
+	sharedmain.Main("prometheussource-controller", prometheussource.NewController)
 }

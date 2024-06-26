@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package reconciler
+package prometheussource
 
 import (
 	"context"
@@ -35,7 +35,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	appsv1listers "k8s.io/client-go/listers/apps/v1"
-	"knative.dev/eventing-prometheus/pkg/reconciler/resources"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/logging"
@@ -44,6 +43,7 @@ import (
 
 	"knative.dev/eventing-prometheus/pkg/apis/sources/v1alpha1"
 	promreconciler "knative.dev/eventing-prometheus/pkg/client/injection/reconciler/sources/v1alpha1/prometheussource"
+	resources2 "knative.dev/eventing-prometheus/pkg/reconciler/prometheussource/resources"
 )
 
 const (
@@ -127,15 +127,15 @@ func (r *Reconciler) createReceiveAdapter(ctx context.Context, src *v1alpha1.Pro
 		logging.FromContext(ctx).Panicf("required environment variable is not defined: %v", err)
 	}
 
-	adapterArgs := resources.ReceiveAdapterArgs{
+	adapterArgs := resources2.ReceiveAdapterArgs{
 		EventSource:    eventSource,
 		Image:          env.Image,
 		Source:         src,
-		Labels:         resources.Labels(src.Name),
+		Labels:         resources2.Labels(src.Name),
 		SinkURI:        sinkURI.String(),
 		AdditionalEnvs: r.configs.ToEnvVars(),
 	}
-	expected := resources.MakeReceiveAdapter(&adapterArgs)
+	expected := resources2.MakeReceiveAdapter(&adapterArgs)
 
 	ra, err := r.kubeClientSet.AppsV1().Deployments(src.Namespace).Get(ctx, expected.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {

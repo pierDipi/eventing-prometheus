@@ -14,26 +14,29 @@
 
 
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: prometheus-controller-manager
-  namespace: knative-sources
+  name: prometheus-controller
+  namespace: knative-eventing
   labels:
-    contrib.eventing.knative.dev/release: devel
-    control-plane: prometheus-controller-manager
+    app: prometheus-controller
+    knative.dev/high-availability: "true"
+    app.kubernetes.io/component: prometheus-controller
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
+    bindings.knative.dev/exclude: "true"
 spec:
   selector:
     matchLabels: &labels
-      control-plane: prometheus-controller-manager
-  serviceName: prometheus-controller-manager
+      app: prometheus-controller
   template:
     metadata:
       labels: *labels
     spec:
-      serviceAccountName: prometheus-controller-manager
+      serviceAccountName: prometheus-controller
       containers:
       - image: ko://knative.dev/eventing-prometheus/cmd/controller
-        name: manager
+        name: prometheus-controller
         env:
         - name: SYSTEM_NAMESPACE
           valueFrom:
@@ -57,7 +60,3 @@ spec:
             cpu: 1000m
             memory: 1000Mi
       terminationGracePeriodSeconds: 10
-      volumes:
-        - name: config-logging
-          configMap:
-            name: config-logging

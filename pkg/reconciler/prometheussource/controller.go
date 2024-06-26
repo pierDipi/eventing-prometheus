@@ -14,22 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package reconciler
+package prometheussource
 
 import (
 	"context"
 
 	"k8s.io/client-go/tools/cache"
-	"knative.dev/eventing-prometheus/pkg/apis/sources/v1alpha1"
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/resolver"
 
-	prometheusinformer "knative.dev/eventing-prometheus/pkg/client/injection/informers/sources/v1alpha1/prometheussource"
-	promreconciler "knative.dev/eventing-prometheus/pkg/client/injection/reconciler/sources/v1alpha1/prometheussource"
+	"knative.dev/eventing-prometheus/pkg/apis/sources/v1alpha1"
+
 	kubeclient "knative.dev/pkg/client/injection/kube/client"
 	deploymentinformer "knative.dev/pkg/client/injection/kube/informers/apps/v1/deployment"
+
+	prometheusinformer "knative.dev/eventing-prometheus/pkg/client/injection/informers/sources/v1alpha1/prometheussource"
+	promreconciler "knative.dev/eventing-prometheus/pkg/client/injection/reconciler/sources/v1alpha1/prometheussource"
 )
 
 const (

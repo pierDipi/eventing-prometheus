@@ -15,26 +15,26 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: prometheus-controller-rolebinding
+  name: knative-eventing-prometheus-controller
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: prometheus-controller
+  name: knative-eventing-prometheus-controller
 subjects:
 - kind: ServiceAccount
-  name: prometheus-controller-manager
-  namespace: knative-sources
+  name: prometheus-controller
+  namespace: knative-eventing
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: eventing-sources-prometheus-controller-addressable-resolver
+  name: knative-eventing-prometheus-controller-addressable-resolver
 subjects:
 - kind: ServiceAccount
-  name: prometheus-controller-manager
-  namespace: knative-sources
+  name: prometheus-controller
+  namespace: knative-eventing
 # An aggregated ClusterRole for all Addressable CRDs.
 # Ref: https://github.com/knative/eventing/tree/master/config/core/rolesaddressable-resolvers-clusterrole.yaml
 roleRef:
@@ -47,14 +47,14 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: eventing-sources-prometheus-webhook
+  name: knative-eventing-prometheus-webhook
   labels:
     contrib.eventing.knative.dev/release: devel
 subjects:
   - kind: ServiceAccount
-    name: prometheus-source-webhook
-    namespace: knative-sources
+    name: prometheus-webhook
+    namespace: knative-eventing
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: prometheus-source-webhook
+  name: knative-eventing-prometheus-webhook
