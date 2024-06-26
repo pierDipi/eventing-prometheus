@@ -27,6 +27,20 @@ echo "=== Update Codegen for ${MODULE_NAME}"
 
 group "Kubernetes Codegen"
 
+# Generate our own client for Prometheus operator (otherwise injection won't work)
+"${CODEGEN_PKG}"/generate-groups.sh "client,informer,lister" \
+  knative.dev/eventing/pkg/client/prometheus github.com/prometheus-operator/prometheus-operator/pkg/apis \
+  "monitoring:v1" \
+  --go-header-file "${REPO_ROOT_DIR}"/hack/boilerplate/boilerplate.go.txt
+
+# Knative Injection (for Prometheus operator)
+"${KNATIVE_CODEGEN_PKG}"/hack/generate-knative.sh "injection" \
+  knative.dev/eventing/pkg/client/prometheus github.com/prometheus-operator/prometheus-operator/pkg/apis \
+  "monitoring:v1" \
+  --lister-has-pointer-elem=true \
+  --go-header-file "${REPO_ROOT_DIR}"/hack/boilerplate/boilerplate.go.txt
+
+
 # Just Sources
 # generate the code with:
 # --output-base    because this script should also be able to run inside the vendor dir of

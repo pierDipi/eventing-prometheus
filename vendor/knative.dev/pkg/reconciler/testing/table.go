@@ -289,7 +289,7 @@ func (r *TableRow) Test(t *testing.T, factory Factory) {
 	// Build a set of unique strings that represent type-name{-namespace}.
 	// Adding type will help catch the bugs where several similarly named
 	// resources are deleted (and some should or should not).
-	gotDeletes := make(sets.String, len(actions.Deletes))
+	gotDeletes := make(sets.Set[string], len(actions.Deletes))
 	for _, w := range actions.Deletes {
 		n := w.GetResource().Resource + "~~" + w.GetName()
 		if !r.SkipNamespaceValidation {
@@ -297,7 +297,7 @@ func (r *TableRow) Test(t *testing.T, factory Factory) {
 		}
 		gotDeletes.Insert(n)
 	}
-	wantDeletes := make(sets.String, len(actions.Deletes))
+	wantDeletes := make(sets.Set[string], len(actions.Deletes))
 	for _, w := range r.WantDeletes {
 		n := w.GetResource().Resource + "~~" + w.GetName()
 		if !r.SkipNamespaceValidation {
@@ -363,7 +363,8 @@ func (r *TableRow) Test(t *testing.T, factory Factory) {
 
 func filterUpdatesWithSubresource(
 	subresource string,
-	actions []clientgotesting.UpdateAction) (result []clientgotesting.UpdateAction) {
+	actions []clientgotesting.UpdateAction,
+) (result []clientgotesting.UpdateAction) {
 	for _, action := range actions {
 		if action.GetSubresource() == subresource {
 			result = append(result, action)
@@ -387,10 +388,13 @@ func (tt TableTest) Test(t *testing.T, factory Factory) {
 		t.Run(test.Name, func(t *testing.T) {
 			t.Helper()
 			test.Test(t, factory)
+			opts := make([]cmp.Option, 0, len(defaultCmpOpts)+len(test.CmpOpts))
+			opts = append(opts, defaultCmpOpts...)
+			opts = append(opts, test.CmpOpts...)
 			// Validate cached objects do not get soiled after controller loops.
-			if !cmp.Equal(originObjects, test.Objects, defaultCmpOpts...) {
+			if !cmp.Equal(originObjects, test.Objects, opts...) {
 				t.Errorf("Unexpected objects (-want, +got):\n%s",
-					cmp.Diff(originObjects, test.Objects, defaultCmpOpts...))
+					cmp.Diff(originObjects, test.Objects, opts...))
 			}
 		})
 	}

@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,12 +41,14 @@ type TestCloudEventsClient struct {
 	}
 }
 
+func (c *TestCloudEventsClient) CloseIdleConnections() {
+}
+
 type EventData struct {
 	ID   string `json:"id"`
 	Type string `json:"type"`
 }
 
-var _ cloudevents.Client = (*TestCloudEventsClient)(nil)
 var eventData EventData
 
 // Send_AppendResult will enqueue a response for the following Send call.
@@ -136,9 +138,7 @@ func (c *TestCloudEventsClient) Sent() []cloudevents.Event {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	r := make([]cloudevents.Event, len(c.sent))
-	for i := range c.sent {
-		r[i] = c.sent[i]
-	}
+	copy(r, c.sent)
 	return r
 }
 

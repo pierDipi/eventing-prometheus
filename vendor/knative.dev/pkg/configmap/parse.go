@@ -165,15 +165,15 @@ func AsDuration(key string, target *time.Duration) ParseFunc {
 	}
 }
 
-// AsStringSet parses the value at key as a sets.String (split by ',') into the target, if it exists.
-func AsStringSet(key string, target *sets.String) ParseFunc {
+// AsStringSet parses the value at key as a sets.Set[string] (split by ',') into the target, if it exists.
+func AsStringSet(key string, target *sets.Set[string]) ParseFunc {
 	return func(data map[string]string) error {
 		if raw, ok := data[key]; ok {
 			splitted := strings.Split(raw, ",")
 			for i, v := range splitted {
 				splitted[i] = strings.TrimSpace(v)
 			}
-			*target = sets.NewString(splitted...)
+			*target = sets.New[string](splitted...)
 		}
 		return nil
 	}
@@ -243,4 +243,25 @@ func Parse(data map[string]string, parsers ...ParseFunc) error {
 		}
 	}
 	return nil
+}
+
+// CollectMapEntriesWithPrefix parses the data into the target as a map[string]string, if it exists.
+// The map is represented as a list of key-value pairs with a common prefix.
+func CollectMapEntriesWithPrefix(prefix string, target *map[string]string) ParseFunc {
+	if target == nil {
+		panic("target cannot be nil")
+	}
+
+	return func(data map[string]string) error {
+		for k, v := range data {
+			if strings.HasPrefix(k, prefix) && len(k) > len(prefix)+1 {
+				if *target == nil {
+					m := make(map[string]string, 2)
+					*target = m
+				}
+				(*target)[k[len(prefix)+1: /* remove dot `.` */]] = v
+			}
+		}
+		return nil
+	}
 }

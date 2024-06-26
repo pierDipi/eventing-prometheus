@@ -27,6 +27,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
+
 	"knative.dev/pkg/hash"
 	"knative.dev/pkg/logging"
 	"knative.dev/pkg/network"
@@ -79,6 +80,12 @@ type Elector interface {
 	Run(context.Context)
 }
 
+// ElectorWithInitialBuckets is an optional interface for electors to
+// supply an initial set of buckets
+type ElectorWithInitialBuckets interface {
+	InitialBuckets() []reconciler.Bucket
+}
+
 // BuildElector builds a leaderelection.LeaderElector for the named LeaderAware
 // reconciler using a builder added to the context via WithStandardLeaderElectorBuilder.
 func BuildElector(ctx context.Context, la reconciler.LeaderAware, queueName string, enq func(reconciler.Bucket, types.NamespacedName)) (Elector, error) {
@@ -110,7 +117,8 @@ type standardBuilder struct {
 }
 
 func (b *standardBuilder) buildElector(ctx context.Context, la reconciler.LeaderAware,
-	queueName string, enq func(reconciler.Bucket, types.NamespacedName)) (Elector, error) {
+	queueName string, enq func(reconciler.Bucket, types.NamespacedName),
+) (Elector, error) {
 	logger := logging.FromContext(ctx)
 
 	id := b.lec.Identity
@@ -183,7 +191,7 @@ func newStandardBuckets(queueName string, cc ComponentConfig) []reconciler.Bucke
 			return standardBucketName(i, queueName, cc)
 		}
 	}
-	names := make(sets.String, cc.Buckets)
+	names := make(sets.Set[string], cc.Buckets)
 	for i := uint32(0); i < cc.Buckets; i++ {
 		names.Insert(ln(i))
 	}
@@ -192,7 +200,11 @@ func newStandardBuckets(queueName string, cc ComponentConfig) []reconciler.Bucke
 }
 
 func standardBucketName(ordinal uint32, queueName string, cc ComponentConfig) string {
-	return strings.ToLower(fmt.Sprintf("%s.%s.%02d-of-%02d", cc.Component, queueName, ordinal, cc.Buckets))
+	prefix := fmt.Sprintf("%s.%s", cc.Component, queueName)
+	if v, ok := cc.LeaseNamesPrefixMapping[prefix]; ok && len(v) > 0 {
+		prefix = v
+	}
+	return strings.ToLower(fmt.Sprintf("%s.%02d-of-%02d", prefix, ordinal, cc.Buckets))
 }
 
 type statefulSetBuilder struct {
@@ -226,7 +238,7 @@ func NewStatefulSetBucketAndSet(buckets int) (reconciler.Bucket, *hash.BucketSet
 			ssc.StatefulSetID.ordinal, buckets)
 	}
 
-	names := make(sets.String, buckets)
+	names := make(sets.Set[string], buckets)
 	for i := 0; i < buckets; i++ {
 		names.Insert(statefulSetPodDNS(i, ssc))
 	}
@@ -250,9 +262,20 @@ type unopposedElector struct {
 	enq func(reconciler.Bucket, types.NamespacedName)
 }
 
+var (
+	_ Elector                   = (*unopposedElector)(nil)
+	_ ElectorWithInitialBuckets = (*unopposedElector)(nil)
+)
+
 // Run implements Elector
 func (ue *unopposedElector) Run(ctx context.Context) {
 	ue.la.Promote(ue.bkt, ue.enq)
+}
+
+func (ue *unopposedElector) InitialBuckets() []reconciler.Bucket {
+	return []reconciler.Bucket{
+		ue.bkt,
+	}
 }
 
 type runAll struct {

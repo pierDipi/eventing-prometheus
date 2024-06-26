@@ -104,10 +104,12 @@ func NewCallback(function func(context.Context, *unstructured.Unstructured) erro
 	return Callback{function: function, supportedVerbs: m}
 }
 
-var _ controller.Reconciler = (*reconciler)(nil)
-var _ pkgreconciler.LeaderAware = (*reconciler)(nil)
-var _ webhook.AdmissionController = (*reconciler)(nil)
-var _ webhook.StatelessAdmissionController = (*reconciler)(nil)
+var (
+	_ controller.Reconciler                = (*reconciler)(nil)
+	_ pkgreconciler.LeaderAware            = (*reconciler)(nil)
+	_ webhook.AdmissionController          = (*reconciler)(nil)
+	_ webhook.StatelessAdmissionController = (*reconciler)(nil)
+)
 
 // Reconcile implements controller.Reconciler
 func (ac *reconciler) Reconcile(ctx context.Context, key string) error {
@@ -245,6 +247,8 @@ func (ac *reconciler) reconcileMutatingWebhook(ctx context.Context, caCert []byt
 			return fmt.Errorf("missing service reference for webhook: %s", wh.Name)
 		}
 		cur.ClientConfig.Service.Path = ptr.String(ac.Path())
+
+		cur.ReinvocationPolicy = ptrReinvocationPolicyType(admissionregistrationv1.IfNeededReinvocationPolicy)
 	}
 
 	if ok, err := kmp.SafeEqual(configuredWebhook, current); err != nil {
@@ -470,4 +474,8 @@ func setDefaults(ctx context.Context, patches duck.JSONPatch, crd resourcesemant
 	}
 
 	return append(patches, patch...), nil
+}
+
+func ptrReinvocationPolicyType(r admissionregistrationv1.ReinvocationPolicyType) *admissionregistrationv1.ReinvocationPolicyType {
+	return &r
 }
