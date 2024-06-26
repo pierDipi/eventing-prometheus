@@ -3,14 +3,16 @@ module knative.dev/eventing-prometheus
 go 1.22.0
 
 require (
+	github.com/ahmetb/gen-crd-api-reference-docs v0.3.1-0.20210420163308-c1402a70e2f1
 	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/google/go-cmp v0.6.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.72.0
 	github.com/robfig/cron v1.2.0
 	go.uber.org/zap v1.27.0
-	k8s.io/api v0.30.1
-	k8s.io/apimachinery v0.30.1
-	k8s.io/client-go v0.30.1
+	k8s.io/api v0.29.2
+	k8s.io/apimachinery v0.29.2
+	k8s.io/client-go v0.29.2
 	knative.dev/eventing v0.41.1-0.20240625163858-0f71292d9887
 	knative.dev/hack v0.0.0-20240607132042-09143140a254
 	knative.dev/pkg v0.0.0-20240625072707-8535fcc248ae
@@ -24,7 +26,7 @@ require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/blendle/zapdriver v1.3.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
-	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudevents/sdk-go/observability/opencensus/v2 v2.15.2 // indirect
 	github.com/coreos/go-oidc/v3 v3.9.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -59,7 +61,6 @@ require (
 	github.com/onsi/gomega v1.32.0 // indirect
 	github.com/openzipkin/zipkin-go v0.4.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.19.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.54.0 // indirect
@@ -67,6 +68,7 @@ require (
 	github.com/prometheus/statsd_exporter v0.22.7 // indirect
 	github.com/rickb777/date v1.13.0 // indirect
 	github.com/rickb777/plural v1.2.1 // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/automaxprocs v1.5.3 // indirect
@@ -90,13 +92,14 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.30.1 // indirect
-	k8s.io/code-generator v0.30.1 // indirect
+	k8s.io/apiextensions-apiserver v0.29.2 // indirect
+	k8s.io/code-generator v0.29.2 // indirect
 	k8s.io/gengo v0.0.0-20240129211411-f967bbeff4b4 // indirect
-	k8s.io/gengo/v2 v2.0.0-20240228010128-51d4e06bde70 // indirect
+	k8s.io/klog v1.0.0 // indirect
 	k8s.io/klog/v2 v2.120.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20240322212309-b815d8309940 // indirect
+	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
 	k8s.io/utils v0.0.0-20240310230437-4693a0247e57 // indirect
+	sigs.k8s.io/controller-runtime v0.17.2 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect

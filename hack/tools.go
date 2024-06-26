@@ -22,4 +22,10 @@ package tools
 import (
 	_ "knative.dev/hack"
 	_ "knative.dev/pkg/hack"
+
+	_ "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	_ "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1beta1"
+
+	_ "github.com/ahmetb/gen-crd-api-reference-docs"
+	_ "github.com/ahmetb/gen-crd-api-reference-docs/template"
 )

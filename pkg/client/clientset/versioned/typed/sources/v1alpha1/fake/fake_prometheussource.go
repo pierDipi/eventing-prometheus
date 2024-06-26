@@ -23,7 +23,6 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -36,9 +35,9 @@ type FakePrometheusSources struct {
 	ns   string
 }
 
-var prometheussourcesResource = schema.GroupVersionResource{Group: "sources.knative.dev", Version: "v1alpha1", Resource: "prometheussources"}
+var prometheussourcesResource = v1alpha1.SchemeGroupVersion.WithResource("prometheussources")
 
-var prometheussourcesKind = schema.GroupVersionKind{Group: "sources.knative.dev", Version: "v1alpha1", Kind: "PrometheusSource"}
+var prometheussourcesKind = v1alpha1.SchemeGroupVersion.WithKind("PrometheusSource")
 
 // Get takes name of the prometheusSource, and returns the corresponding prometheusSource object, and an error if there is any.
 func (c *FakePrometheusSources) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.PrometheusSource, err error) {
@@ -117,7 +116,7 @@ func (c *FakePrometheusSources) UpdateStatus(ctx context.Context, prometheusSour
 // Delete takes name of the prometheusSource and deletes it. Returns an error if one occurs.
 func (c *FakePrometheusSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(prometheussourcesResource, c.ns, name), &v1alpha1.PrometheusSource{})
+		Invokes(testing.NewDeleteActionWithOptions(prometheussourcesResource, c.ns, name, opts), &v1alpha1.PrometheusSource{})
 
 	return err
 }
