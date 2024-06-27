@@ -28,6 +28,10 @@ type FakeSourcesV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeSourcesV1alpha1) PrometheusRuleSources(namespace string) v1alpha1.PrometheusRuleSourceInterface {
+	return &FakePrometheusRuleSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) PrometheusSources(namespace string) v1alpha1.PrometheusSourceInterface {
 	return &FakePrometheusSources{c, namespace}
 }

@@ -53,6 +53,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=sources.knative.dev, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("prometheusrulesources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().PrometheusRuleSources().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("prometheussources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().PrometheusSources().Informer()}, nil
 

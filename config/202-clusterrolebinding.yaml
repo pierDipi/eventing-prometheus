@@ -49,7 +49,7 @@ kind: ClusterRoleBinding
 metadata:
   name: knative-eventing-prometheus-webhook
   labels:
-    contrib.eventing.knative.dev/release: devel
+    app.kubernetes.io/version: devel
 subjects:
   - kind: ServiceAccount
     name: prometheus-webhook

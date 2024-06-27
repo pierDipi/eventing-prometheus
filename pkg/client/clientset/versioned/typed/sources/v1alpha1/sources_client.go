@@ -28,12 +28,17 @@ import (
 
 type SourcesV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	PrometheusRuleSourcesGetter
 	PrometheusSourcesGetter
 }
 
 // SourcesV1alpha1Client is used to interact with features provided by the sources.knative.dev group.
 type SourcesV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *SourcesV1alpha1Client) PrometheusRuleSources(namespace string) PrometheusRuleSourceInterface {
+	return newPrometheusRuleSources(c, namespace)
 }
 
 func (c *SourcesV1alpha1Client) PrometheusSources(namespace string) PrometheusSourceInterface {

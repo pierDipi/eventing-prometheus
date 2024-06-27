@@ -20,6 +20,7 @@ import (
 	"context"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"knative.dev/pkg/apis"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/injection/sharedmain"
@@ -34,7 +35,8 @@ import (
 )
 
 var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
-	sourcev1alpha1.SchemeGroupVersion.WithKind("PrometheusSource"): &sourcev1alpha1.PrometheusSource{},
+	sourcev1alpha1.SchemeGroupVersion.WithKind("PrometheusSource"):     &sourcev1alpha1.PrometheusSource{},
+	sourcev1alpha1.SchemeGroupVersion.WithKind("PrometheusRuleSource"): &sourcev1alpha1.PrometheusRuleSource{},
 }
 
 var callbacks = map[schema.GroupVersionKind]validation.Callback{}
@@ -79,7 +81,7 @@ func NewValidationAdmissionController(ctx context.Context, cmw configmap.Watcher
 		func(ctx context.Context) context.Context {
 			// Here is where you would infuse the context with state
 			// (e.g. attach a store with configmap data)
-			return ctx
+			return apis.AllowDifferentNamespace(ctx)
 		},
 
 		// Whether to disallow unknown fields.

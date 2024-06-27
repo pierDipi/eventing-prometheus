@@ -18,6 +18,14 @@ limitations under the License.
 
 package v1alpha1
 
+// PrometheusRuleSourceListerExpansion allows custom methods to be added to
+// PrometheusRuleSourceLister.
+type PrometheusRuleSourceListerExpansion interface{}
+
+// PrometheusRuleSourceNamespaceListerExpansion allows custom methods to be added to
+// PrometheusRuleSourceNamespaceLister.
+type PrometheusRuleSourceNamespaceListerExpansion interface{}
+
 // PrometheusSourceListerExpansion allows custom methods to be added to
 // PrometheusSourceLister.
 type PrometheusSourceListerExpansion interface{}

@@ -24,6 +24,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
+	// PrometheusRuleSources returns a PrometheusRuleSourceInformer.
+	PrometheusRuleSources() PrometheusRuleSourceInformer
 	// PrometheusSources returns a PrometheusSourceInformer.
 	PrometheusSources() PrometheusSourceInformer
 }
@@ -37,6 +39,11 @@ type version struct {
 // New returns a new Interface.
 func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
+}
+
+// PrometheusRuleSources returns a PrometheusRuleSourceInformer.
+func (v *version) PrometheusRuleSources() PrometheusRuleSourceInformer {
+	return &prometheusRuleSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // PrometheusSources returns a PrometheusSourceInformer.

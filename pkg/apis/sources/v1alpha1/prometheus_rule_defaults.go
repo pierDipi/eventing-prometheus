@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Knative Authors
+Copyright 2024 The Knative Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package v1alpha1
 
 import (
-	"knative.dev/eventing-prometheus/pkg/reconciler/prometheussource"
-
-	"knative.dev/pkg/injection/sharedmain"
+	"context"
 )
 
-func main() {
-	sharedmain.Main("prometheussource-controller",
-		prometheussource.NewController,
-	)
+func (s *PrometheusRuleSource) SetDefaults(ctx context.Context) {
+	s.Spec.SetDefaults(ctx)
+}
+
+func (s *PrometheusRuleSourceSpec) SetDefaults(ctx context.Context) {
+	// Nothing yet.
 }

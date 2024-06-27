@@ -24,9 +24,9 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "dev.knative.prometheus.promql" }
+        { "type": "dev.knative.prometheus.alert" }
       ]
-  name: prometheussources.sources.knative.dev
+  name: prometheusrulesources.sources.knative.dev
 spec:
   group: sources.knative.dev
   versions:
@@ -63,6 +63,6 @@ spec:
     - knative
     - eventing
     - sources
-    kind: PrometheusSource
-    plural: prometheussources
+    kind: PrometheusRuleSource
+    plural: prometheusrulesources
   scope: Namespaced
