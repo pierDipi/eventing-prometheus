@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ds-1
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: my-alerts
+  namespace: ds-1
+  labels:
+    role: alert-rules
+spec:
+  groups:
+    - name: ExampleAlertGroup
+      rules:
+        - alert: ExampleAlert1
+          expr: "vector(1)"
+          labels:
+            myalert1: "true"
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: my-alerts
+  namespace: ds-1
+spec:
+  route:
+    groupBy: [ 'alertname']
+    groupWait: 30s
+    groupInterval: 1m
+    repeatInterval: 2m
+    receiver: 'webhook'
+    matchers:
+      - matchType: =
+        name: myalert1
+        value: "true"
+  receivers:
+    - name: 'webhook'
+      webhookConfigs:
+        - url: 'http://alertmanager-webhook-logger.ds-1.svc'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: alertmanager-webhook-logger
+  name: alertmanager-webhook-logger
+  namespace: ds-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager-webhook-logger
+  template:
+    metadata:
+      labels:
+        app: alertmanager-webhook-logger
+    spec:
+      containers:
+        - image: quay.io/pierdipi/alertmanager-webhook-logger-3b5723ee51a404f252f8a30d03820a50@sha256:4fb10b7cedbdb1cbb2c24e46d4236c384f808446c634b1fe8c11c1ea49f3dc4b
+          name: alertmanager-webhook-logger
+          resources:
+            requests:
+              cpu: 200m
+              memory: 100M
+            limits:
+              cpu: 200m
+              memory: 100M
+          ports:
+            - containerPort: 6725
+              name: http
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager-webhook-logger
+  namespace: ds-1
+  labels:
+    app: alertmanager-webhook-logger
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 6725
+  selector:
+    app: alertmanager-webhook-logger
+  type: ClusterIP
+---

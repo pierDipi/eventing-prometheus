@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	v1alpha1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1alpha1"
 	v1beta1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1beta1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
@@ -68,6 +69,14 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().ServiceMonitors().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("thanosrulers"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1().ThanosRulers().Informer()}, nil
+
+		// Group=monitoring.coreos.com, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("alertmanagerconfigs"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().AlertmanagerConfigs().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("prometheusagents"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().PrometheusAgents().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("scrapeconfigs"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Monitoring().V1alpha1().ScrapeConfigs().Informer()}, nil
 
 		// Group=monitoring.coreos.com, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithResource("alertmanagerconfigs"):

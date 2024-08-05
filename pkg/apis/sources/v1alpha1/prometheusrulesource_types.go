@@ -28,6 +28,12 @@ import (
 	"knative.dev/pkg/webhook/resourcesemantics"
 )
 
+const (
+	SourceSelector       = "prometheus.sources.knative.dev"
+	SourceNameLabel      = "prometheus.sources.knative.dev/name"
+	SourceNamespaceLabel = "prometheus.sources.knative.dev/namespace"
+)
+
 // +genclient
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -79,6 +85,32 @@ type PrometheusRuleSourceSpec struct {
 type PrometheusRuleSpec struct {
 	// Rule is the prometheus rule spec.
 	Rule monitoringv1.PrometheusRuleSpec `json:"rule"`
+	// How long to wait before sending the initial notification.
+	// Must match the regular expression`^(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?$`
+	// Example: "30s"
+	// +optional
+	GroupWait string `json:"groupWait,omitempty"`
+	// How long to wait before sending an updated notification.
+	// Must match the regular expression`^(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?$`
+	// Example: "5m"
+	// +optional
+	GroupInterval string `json:"groupInterval,omitempty"`
+	// How long to wait before repeating the last notification.
+	// Must match the regular expression`^(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?$`
+	// Example: "4h"
+	// +optional
+	RepeatInterval string `json:"repeatInterval,omitempty"`
+	// List of labels to group by.
+	// Labels must not be repeated (unique list).
+	// Special label "..." (aggregate by all possible labels), if provided, must be the only element in the list.
+	// +optional
+	GroupBy []string `json:"groupBy,omitempty"`
+	// MuteTimeIntervals is a list of TimeInterval names that will mute this route when matched.
+	// +optional
+	MuteTimeIntervals []string `json:"muteTimeIntervals,omitempty"`
+	// ActiveTimeIntervals is a list of TimeInterval names when this route should be active.
+	// +optional
+	ActiveTimeIntervals []string `json:"activeTimeIntervals,omitempty"`
 }
 
 // PrometheusRuleEventSpec is the event emitted by PrometheusRuleSource when an alert is firing.

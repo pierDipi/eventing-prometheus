@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	"knative.dev/pkg/apis"
+	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
 const (
@@ -50,9 +51,12 @@ func (s *PrometheusRuleSourceStatus) InitializeConditions() {
 }
 
 // MarkSink sets the condition that the source has a sink configured.
-func (s *PrometheusRuleSourceStatus) MarkSink(uri *apis.URL) {
-	s.SinkURI = uri
-	if !uri.IsEmpty() {
+func (s *PrometheusRuleSourceStatus) MarkSink(addr duckv1.Addressable) {
+	s.SinkURI = addr.URL
+	s.SinkCACerts = addr.CACerts
+	s.SinkAudience = addr.Audience
+
+	if !addr.URL.IsEmpty() {
 		s.GetConditionSet().Manage(s).MarkTrue(PrometheusRuleConditionSinkProvided)
 	} else {
 		s.GetConditionSet().Manage(s).MarkUnknown(PrometheusRuleConditionSinkProvided, "SinkEmpty", "Sink has resolved to empty.%s", "")

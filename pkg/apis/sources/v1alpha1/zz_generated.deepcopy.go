@@ -154,6 +154,21 @@ func (in *PrometheusRuleSourceStatus) DeepCopy() *PrometheusRuleSourceStatus {
 func (in *PrometheusRuleSpec) DeepCopyInto(out *PrometheusRuleSpec) {
 	*out = *in
 	in.Rule.DeepCopyInto(&out.Rule)
+	if in.GroupBy != nil {
+		in, out := &in.GroupBy, &out.GroupBy
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
+	if in.MuteTimeIntervals != nil {
+		in, out := &in.MuteTimeIntervals, &out.MuteTimeIntervals
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
+	if in.ActiveTimeIntervals != nil {
+		in, out := &in.ActiveTimeIntervals, &out.ActiveTimeIntervals
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	return
 }
 

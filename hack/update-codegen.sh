@@ -48,13 +48,13 @@ group "Prometheus operator codegen"
 # Generate our own client for Prometheus operator (otherwise injection won't work)
 "${CODEGEN_PKG}"/generate-groups.sh "client,informer,lister" \
   knative.dev/eventing-prometheus/pkg/client/prometheus github.com/prometheus-operator/prometheus-operator/pkg/apis \
-  "monitoring:v1 monitoring:v1beta1" \
+  "monitoring:v1 monitoring:v1beta1 monitoring:v1alpha1" \
   --go-header-file "${REPO_ROOT_DIR}"/hack/boilerplate.go.txt
 
 # Knative Injection (for Prometheus operator)
 "${KNATIVE_CODEGEN_PKG}"/hack/generate-knative.sh "injection" \
   knative.dev/eventing-prometheus/pkg/client/prometheus github.com/prometheus-operator/prometheus-operator/pkg/apis \
-  "monitoring:v1 monitoring:v1beta1" \
+  "monitoring:v1 monitoring:v1beta1 monitoring:v1alpha1" \
   --go-header-file "${REPO_ROOT_DIR}"/hack/boilerplate.go.txt
 
 group "Deepcopy Gen"

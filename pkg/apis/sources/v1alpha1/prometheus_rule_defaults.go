@@ -18,12 +18,29 @@ package v1alpha1
 
 import (
 	"context"
+
+	"knative.dev/pkg/apis"
 )
 
 func (s *PrometheusRuleSource) SetDefaults(ctx context.Context) {
+	ctx = apis.WithinParent(ctx, s.ObjectMeta)
+
+	if s.Labels == nil {
+		s.Labels = map[string]string{}
+	}
+	s.Labels[SourceNameLabel] = s.Name
+
 	s.Spec.SetDefaults(ctx)
 }
 
 func (s *PrometheusRuleSourceSpec) SetDefaults(ctx context.Context) {
-	// Nothing yet.
+	for i := range s.Rule.Rule.Groups {
+		for j := range s.Rule.Rule.Groups[i].Rules {
+			if s.Rule.Rule.Groups[i].Rules[j].Labels == nil {
+				s.Rule.Rule.Groups[i].Rules[j].Labels = map[string]string{}
+			}
+			s.Rule.Rule.Groups[i].Rules[j].Labels[SourceNameLabel] = apis.ParentMeta(ctx).Name
+			s.Rule.Rule.Groups[i].Rules[j].Labels[SourceNamespaceLabel] = apis.ParentMeta(ctx).Namespace
+		}
+	}
 }

@@ -17,13 +17,24 @@ limitations under the License.
 package main
 
 import (
+	"knative.dev/pkg/signals"
+
+	sources "knative.dev/eventing-prometheus/pkg/apis/sources/v1alpha1"
+	"knative.dev/eventing-prometheus/pkg/reconciler/prometheusrulesource"
 	"knative.dev/eventing-prometheus/pkg/reconciler/prometheussource"
 
 	"knative.dev/pkg/injection/sharedmain"
+
+	prometheusinformerfilteredfactory "knative.dev/eventing-prometheus/pkg/client/prometheus/injection/informers/factory/filtered"
 )
 
 func main() {
-	sharedmain.Main("prometheussource-controller",
+	ctx := signals.NewContext()
+
+	ctx = prometheusinformerfilteredfactory.WithSelectors(ctx, sources.SourceSelector)
+
+	sharedmain.MainWithContext(ctx, "prometheussource-controller",
 		prometheussource.NewController,
+		prometheusrulesource.NewController,
 	)
 }
